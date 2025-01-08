@@ -1,0 +1,97 @@
+diff --git a/build_tools/waf_dynamo.py b/build_tools/waf_dynamo.py
+index 4bd9ca09f7..4a15802c3d 100644
+--- a/build_tools/waf_dynamo.py
++++ b/build_tools/waf_dynamo.py
+@@ -1449,6 +1449,9 @@ def run_tests(ctx, valgrind = False, configfile = None):
+             if 'web' in ctx.env.PLATFORM: # should be moved to TEST_LAUNCH_ARGS
+                 cmd = '%s %s' % (ctx.env['NODEJS'][0], cmd)
+ 
++            if ctx.env.PLATFORM != ctx.env.BUILD_PLATFORM and 'arm64-linux' in ctx.env.PLATFORM:
++                cmd = '%s %s' % ('qemu-aarch64 -L /usr/aarch64-linux-gnu', cmd) # TODO: move to ctx.env['QEMU_AARCH64']
++
+         # disable shortly during beta release, due to issue with jctest + test_gui
+         valgrind = False
+         if valgrind:
+@@ -1731,6 +1734,11 @@ def detect(conf):
+             conf.env.CC = "clang"
+             conf.env.CPP = "clang -E"
+ 
++        if platform == 'arm64-linux' and platform != host_platform and not Options.options.skip_tests:
++            # We'll use qemu to run tests on non-arm64 platforms
++            if not conf.env['QEMU_AARCH64']:
++                conf.find_program('qemu-aarch64', var='QEMU_AARCH64', mandatory = True)
++
+     platform_setup_tools(conf, build_util)
+ 
+     # jg: this whole thing is a 'dirty hack' to be able to pick up our own SDKs
+diff --git a/engine/gamesys/src/gamesys/test/http/test_http_timeout.lua.raw b/engine/gamesys/src/gamesys/test/http/test_http_timeout.lua.raw
+index 20be336dcb..2e7895a1a6 100644
+--- a/engine/gamesys/src/gamesys/test/http/test_http_timeout.lua.raw
++++ b/engine/gamesys/src/gamesys/test/http/test_http_timeout.lua.raw
+@@ -26,7 +26,7 @@ function test_http_timeout()
+     options['timeout'] = 1.0
+ 
+     print("Failing http requests ahead ->")
+-    http.request("http://127.0.0.1:" .. PORT .. "/sleep/1.5", "GET",
++    http.request(ADDRESS .. "/sleep/1.5", "GET",
+         function(response)
+             assert(response.status == 0)
+             requests_left = requests_left - 1
+@@ -35,7 +35,7 @@ function test_http_timeout()
+     requests_left = requests_left + 1
+ 
+     -- The config file also specifies a timeout value, let's test that too
+-    http.request("http://127.0.0.1:" .. PORT .. "/sleep", "GET",
++    http.request(ADDRESS .. "/sleep", "GET",
+         function(response)
+             assert(response.status == 0)
+             requests_left = requests_left - 1
+@@ -44,7 +44,7 @@ function test_http_timeout()
+     requests_left = requests_left + 1
+ 
+     -- Also test one that succeeds, i.e. does not time out
+-    http.request("http://127.0.0.1:" .. PORT .. "/sleep/0.5", "GET",
++    http.request(ADDRESS .. "/sleep/0.5", "GET",
+         function(response)
+             assert(response.status == 200)
+             requests_left = requests_left - 1
+@@ -55,7 +55,7 @@ function test_http_timeout()
+     for i=1,10 do
+ 
+         options['timeout'] = 1.0
+-        http.request(string.format("http://127.0.0.1:" .. PORT .. "/sleep/1.10%d", i), "GET",
++        http.request(string.format(ADDRESS .. "/sleep/1.10%d", i), "GET",
+             function(response)
+                 assert(response.status == 0) -- it should timeout
+ 
+diff --git a/scripts/build.py b/scripts/build.py
+index 8d3ec5ae34..4694137a4c 100755
+--- a/scripts/build.py
++++ b/scripts/build.py
+@@ -35,7 +35,7 @@ from threading import Thread, Event
+ from queue import Queue
+ from configparser import ConfigParser
+ 
+-BASE_PLATFORMS = [  'x86_64-linux', #'arm64-linux',
++BASE_PLATFORMS = [  'x86_64-linux', 'arm64-linux',
+                     'x86_64-macos', 'arm64-macos',
+                     'win32', 'x86_64-win32',
+                     'x86_64-ios', 'arm64-ios',
+@@ -1010,6 +1010,9 @@ class Configuration(object):
+         if self.target_platform in ('x86_64-macos','arm64-macos','arm64-ios','x86_64-ios') and 'linux' == sys.platform:
+             strip = os.path.join(sdkfolder, 'linux', sdk.PACKAGES_LINUX_CLANG, 'bin', 'x86_64-apple-darwin19-strip')
+ 
++        if self.target_platform == 'arm64-linux' and self.host != self.target_platform:
++            strip = '/usr/bin/aarch64-linux-gnu-strip'
++
+         run.shell_command("%s %s" % (strip, path))
+         return True
+ 
+@@ -1107,6 +1110,7 @@ class Configuration(object):
+         supported_tests['x86_64-win32'] = ['win32', 'x86_64-win32', 'arm64-nx64', 'x86_64-ps4', 'x86_64-ps5']
+         supported_tests['arm64-macos'] = ['x86_64-macos', 'arm64-macos', 'wasm-web', 'js-web']
+         supported_tests['x86_64-macos'] = ['x86_64-macos', 'wasm-web', 'js-web']
++        supported_tests['x86_64-linux'] = ['arm64-linux']
+ 
+         return self.target_platform in supported_tests.get(self.host, []) or self.host == self.target_platform
+ 
