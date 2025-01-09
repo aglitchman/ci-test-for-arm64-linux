@@ -97,20 +97,49 @@ index c99d8717a6..471cca12c2 100644
          return;
      }
 diff --git a/engine/dlib/src/test/test_httpclient.cpp b/engine/dlib/src/test/test_httpclient.cpp
-index ca4167c7a4..55b01e7947 100644
+index ca4167c7a4..1e16b21ffb 100644
 --- a/engine/dlib/src/test/test_httpclient.cpp
 +++ b/engine/dlib/src/test/test_httpclient.cpp
-@@ -793,10 +793,13 @@ TEST_P(dmHttpClientTest, Post)
+@@ -779,6 +779,24 @@ TEST_P(dmHttpClientTest, Test404)
+     }
+ }
+ 
++static std::string string_to_hex(const std::string& input)
++{
++    static const char hex_digits[] = "0123456789ABCDEF";
++
++    std::string output;
++    output.reserve(input.length() * 5);
++    output.push_back("{");
++    for (unsigned char c : input)
++    {
++        output.push_back("0x");
++        output.push_back(hex_digits[c >> 4]);
++        output.push_back(hex_digits[c & 15]);
++        output.push_back("+");
++    }
++    output.push_back("}");
++    return output;
++}
++
+ TEST_P(dmHttpClientTest, Post)
+ {
+     for (int i = 0; i < 27; ++i)
+@@ -790,13 +808,17 @@ TEST_P(dmHttpClientTest, Post)
+         for (int j = 0; j < n; ++j) {
+             char buf[2] = { (char)((rand() % 255) - 128), 0 };
+             m_ToPost.append(buf);
++            dmLogInfo("<!> - %d + %d", sum, buf[0]);
              sum += buf[0];
          }
  
-+        dmLogInfo("<!> POSTing to %s://%s%s content %s", m_URI.m_Scheme, m_URI.m_Location, m_URI.m_Path, m_ToPost.c_str());
++        dmLogInfo("<!> POSTing to %s://%s%s content %s", m_URI.m_Scheme, m_URI.m_Location, m_URI.m_Path, string_to_hex(m_ToPost).c_str());
 +
          dmHttpClient::Result r;
          m_Content = "";
          m_StatusCode = -1;
          r = dmHttpClient::Post(m_Client, "/post");
-+        dmLogInfo("<!> Result is %d, content %s, expected sum %d => got %d", r, m_Content.c_str(), sum, atoi(m_Content.c_str()));
++        dmLogInfo("<!> HTTP result is %d, content %s, expected sum %d => got %d", r, m_Content.c_str(), sum, atoi(m_Content.c_str()));
          ASSERT_EQ(dmHttpClient::RESULT_OK, r);
          ASSERT_EQ(200, m_StatusCode);
          ASSERT_EQ(sum, atoi(m_Content.c_str()));
