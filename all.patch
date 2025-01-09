@@ -24,6 +24,78 @@ index 4bd9ca09f7..4a15802c3d 100644
      platform_setup_tools(conf, build_util)
  
      # jg: this whole thing is a 'dirty hack' to be able to pick up our own SDKs
+diff --git a/engine/dlib/src/dlib/linux/socket_linux.cpp b/engine/dlib/src/dlib/linux/socket_linux.cpp
+index c99d8717a6..471cca12c2 100644
+--- a/engine/dlib/src/dlib/linux/socket_linux.cpp
++++ b/engine/dlib/src/dlib/linux/socket_linux.cpp
+@@ -44,10 +44,13 @@ namespace dmSocket
+         ifc.ifc_ifcu.ifcu_req = ifr;
+         ifc.ifc_len = sizeof(buf);
+         if (ioctl(s, SIOCGIFCONF, &ifc) < 0) {
++            dmLogInfo("<!> Unable to get interface addresses");
+             close(s);
+             return;
+         }
+ 
++        dmLogInfo("<!> Got interface addresses");
++
+         // NOTE: This is not compatible with BSD. You can't assume
+         // equivalent size for all items
+         int numif = ifc.ifc_len / sizeof(struct ifreq);
+@@ -55,6 +58,7 @@ namespace dmSocket
+             struct ifreq *r = &ifr[i];
+ 
+             if (strcmp(r->ifr_name, "lo") == 0) {
++                dmLogInfo("<!> Skipping loopback interface");
+                 continue;
+             }
+ 
+@@ -63,8 +67,10 @@ namespace dmSocket
+ 
+             dmStrlCpy(a->m_Name, r->ifr_name, sizeof(a->m_Name));
+ 
+-            if(ioctl(s, SIOCGIFADDR, r) < 0)
++            if(ioctl(s, SIOCGIFADDR, r) < 0) {
++                dmLogInfo("<!> Unable to get interface address");
+                 continue;
++            }
+ 
+             if (r->ifr_addr.sa_family == AF_INET)
+             {
+@@ -80,6 +86,10 @@ namespace dmSocket
+                 a->m_Address.m_family = DOMAIN_IPV6;
+                 memcpy(IPv6(&a->m_Address), &ia->sin6_addr, sizeof(struct in6_addr));
+             }
++            else
++            {
++                dmLogInfo("<!> Unsupported address family %d", r->ifr_addr.sa_family);
++            }
+ 
+             if(ioctl(s, SIOCGIFHWADDR, r) >= 0)
+             {
+@@ -91,9 +101,11 @@ namespace dmSocket
+                 memset(a->m_MacAddress, 0x00, sizeof(unsigned char) * 6);
+             }
+ 
+-            if(ioctl(s, SIOCGIFFLAGS, r) < 0)
++            if(ioctl(s, SIOCGIFFLAGS, r) < 0) {
++                dmLogInfo("<!> Unable to get interface flags");
+                 continue;
+-            
++            }
++
+             if (r->ifr_ifru.ifru_flags & IFF_UP) {
+                 a->m_Flags |= FLAGS_UP;
+             }
+@@ -104,6 +116,8 @@ namespace dmSocket
+             *count = *count + 1;
+         }
+ 
++        dmLogInfo("<!> Got %d interface addresses", *count);
++
+         close(s);
+         return;
+     }
 diff --git a/engine/gamesys/src/gamesys/test/http/test_http_timeout.lua.raw b/engine/gamesys/src/gamesys/test/http/test_http_timeout.lua.raw
 index 20be336dcb..2e7895a1a6 100644
 --- a/engine/gamesys/src/gamesys/test/http/test_http_timeout.lua.raw
