@@ -97,10 +97,10 @@ index c99d8717a6..471cca12c2 100644
          return;
      }
 diff --git a/engine/dlib/src/test/test_httpclient.cpp b/engine/dlib/src/test/test_httpclient.cpp
-index ca4167c7a4..1e16b21ffb 100644
+index ca4167c7a4..b5ff84efea 100644
 --- a/engine/dlib/src/test/test_httpclient.cpp
 +++ b/engine/dlib/src/test/test_httpclient.cpp
-@@ -779,6 +779,24 @@ TEST_P(dmHttpClientTest, Test404)
+@@ -779,6 +779,25 @@ TEST_P(dmHttpClientTest, Test404)
      }
  }
  
@@ -110,22 +110,23 @@ index ca4167c7a4..1e16b21ffb 100644
 +
 +    std::string output;
 +    output.reserve(input.length() * 5);
-+    output.push_back("{");
++    output.push_back('{');
 +    for (unsigned char c : input)
 +    {
-+        output.push_back("0x");
++        output.push_back('0');
++        output.push_back('x');
 +        output.push_back(hex_digits[c >> 4]);
 +        output.push_back(hex_digits[c & 15]);
-+        output.push_back("+");
++        output.push_back('+');
 +    }
-+    output.push_back("}");
++    output.push_back('}');
 +    return output;
 +}
 +
  TEST_P(dmHttpClientTest, Post)
  {
      for (int i = 0; i < 27; ++i)
-@@ -790,13 +808,17 @@ TEST_P(dmHttpClientTest, Post)
+@@ -790,13 +809,17 @@ TEST_P(dmHttpClientTest, Post)
          for (int j = 0; j < n; ++j) {
              char buf[2] = { (char)((rand() % 255) - 128), 0 };
              m_ToPost.append(buf);
