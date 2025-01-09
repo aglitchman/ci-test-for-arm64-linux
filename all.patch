@@ -97,7 +97,7 @@ index c99d8717a6..471cca12c2 100644
          return;
      }
 diff --git a/engine/dlib/src/test/test_httpclient.cpp b/engine/dlib/src/test/test_httpclient.cpp
-index ca4167c7a4..329d7d1bc7 100644
+index ca4167c7a4..8db6569964 100644
 --- a/engine/dlib/src/test/test_httpclient.cpp
 +++ b/engine/dlib/src/test/test_httpclient.cpp
 @@ -779,6 +779,25 @@ TEST_P(dmHttpClientTest, Test404)
@@ -126,15 +126,17 @@ index ca4167c7a4..329d7d1bc7 100644
  TEST_P(dmHttpClientTest, Post)
  {
      for (int i = 0; i < 27; ++i)
-@@ -788,15 +807,19 @@ TEST_P(dmHttpClientTest, Post)
+@@ -788,15 +807,20 @@ TEST_P(dmHttpClientTest, Post)
          m_ToPost = "";
  
          for (int j = 0; j < n; ++j) {
 -            char buf[2] = { (char)((rand() % 255) - 128), 0 };
-+            char buf[2] = { (char)(int(rand() % 255) - 128), 0 };
++            int v = (rand() % 255) - 128;
++            char buf[2] = { (char)v, 0 };
              m_ToPost.append(buf);
-+            dmLogInfo("<!> - %d + %d", sum, buf[0]);
-             sum += buf[0];
+-            sum += buf[0];
++            dmLogInfo("<!> - %d + %d", sum, v);
++            sum += v;
          }
  
 +        dmLogInfo("<!> POSTing to %s://%s%s content %s", m_URI.m_Scheme, m_URI.m_Location, m_URI.m_Path, string_to_hex(m_ToPost).c_str());
