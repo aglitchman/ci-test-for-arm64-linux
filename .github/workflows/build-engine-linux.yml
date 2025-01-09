@@ -63,7 +63,8 @@ jobs:
           echo 'deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports focal-updates main restricted universe multiverse' | sudo tee -a /etc/apt/sources.list
           echo 'deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports focal-security main restricted universe multiverse' | sudo tee -a /etc/apt/sources.list
           sudo apt update
-          sudo apt install --no-install-recommends -y crossbuild-essential-arm64 qemu-user libc6-dev:arm64 libx11-dev:arm64 libxi-dev:arm64 libxcb-xkb-dev:arm64 libglu-dev:arm64 libgl-dev:arm64 libgles-dev:arm64 libopenal-dev:arm64 net-tools:arm64
+          sudo apt install --no-install-recommends -y crossbuild-essential-arm64 qemu-user libc6-dev:arm64 libx11-dev:arm64 libxi-dev:arm64 libxcb-xkb-dev:arm64 libglu-dev:arm64 libgl-dev:arm64 libgles-dev:arm64 libopenal-dev:arm64
+          sudo apt install -y net-tools:arm64
 
       - name: Check qemu network
         if: matrix.platform == 'arm64-linux'
