@@ -96,6 +96,24 @@ index c99d8717a6..471cca12c2 100644
          close(s);
          return;
      }
+diff --git a/engine/dlib/src/test/test_httpclient.cpp b/engine/dlib/src/test/test_httpclient.cpp
+index ca4167c7a4..55b01e7947 100644
+--- a/engine/dlib/src/test/test_httpclient.cpp
++++ b/engine/dlib/src/test/test_httpclient.cpp
+@@ -793,10 +793,13 @@ TEST_P(dmHttpClientTest, Post)
+             sum += buf[0];
+         }
+ 
++        dmLogInfo("<!> POSTing to %s://%s%s content %s", m_URI.m_Scheme, m_URI.m_Location, m_URI.m_Path, m_ToPost.c_str());
++
+         dmHttpClient::Result r;
+         m_Content = "";
+         m_StatusCode = -1;
+         r = dmHttpClient::Post(m_Client, "/post");
++        dmLogInfo("<!> Result is %d, content %s, expected sum %d => got %d", r, m_Content.c_str(), sum, atoi(m_Content.c_str()));
+         ASSERT_EQ(dmHttpClient::RESULT_OK, r);
+         ASSERT_EQ(200, m_StatusCode);
+         ASSERT_EQ(sum, atoi(m_Content.c_str()));
 diff --git a/engine/dlib/src/test/test_socket.cpp b/engine/dlib/src/test/test_socket.cpp
 index 7d28a552df..0853dafdd3 100644
 --- a/engine/dlib/src/test/test_socket.cpp
