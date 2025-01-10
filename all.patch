@@ -97,7 +97,7 @@ index c99d8717a6..471cca12c2 100644
          return;
      }
 diff --git a/engine/dlib/src/test/test_httpclient.cpp b/engine/dlib/src/test/test_httpclient.cpp
-index ca4167c7a4..8db6569964 100644
+index ca4167c7a4..08f5411444 100644
 --- a/engine/dlib/src/test/test_httpclient.cpp
 +++ b/engine/dlib/src/test/test_httpclient.cpp
 @@ -779,6 +779,25 @@ TEST_P(dmHttpClientTest, Test404)
@@ -135,20 +135,33 @@ index ca4167c7a4..8db6569964 100644
 +            char buf[2] = { (char)v, 0 };
              m_ToPost.append(buf);
 -            sum += buf[0];
-+            dmLogInfo("<!> - %d + %d", sum, v);
++            // dmLogInfo("<!> - %d + %d", sum, v);
 +            sum += v;
          }
  
-+        dmLogInfo("<!> POSTing to %s://%s%s content %s", m_URI.m_Scheme, m_URI.m_Location, m_URI.m_Path, string_to_hex(m_ToPost).c_str());
++        // dmLogInfo("<!> POSTing to %s://%s%s content %s", m_URI.m_Scheme, m_URI.m_Location, m_URI.m_Path, string_to_hex(m_ToPost).c_str());
 +
          dmHttpClient::Result r;
          m_Content = "";
          m_StatusCode = -1;
          r = dmHttpClient::Post(m_Client, "/post");
-+        dmLogInfo("<!> HTTP result is %d, content %s, expected sum %d => got %d", r, m_Content.c_str(), sum, atoi(m_Content.c_str()));
++        dmLogInfo("<!> HTTP result is %d, expected sum %d => got %d", r, sum, atoi(m_Content.c_str()));
          ASSERT_EQ(dmHttpClient::RESULT_OK, r);
          ASSERT_EQ(200, m_StatusCode);
          ASSERT_EQ(sum, atoi(m_Content.c_str()));
+@@ -813,9 +837,10 @@ TEST_P(dmHttpClientTest, PostLarge)
+         m_ToPost = "";
+ 
+         for (int j = 0; j < n; ++j) {
+-            char buf[2] = { (char)((rand() % 255) - 128), 0 };
++            int v = (rand() % 255) - 128;
++            char buf[2] = { (char)v, 0 };
+             m_ToPost.append(buf);
+-            sum += buf[0];
++            sum += v;
+         }
+ 
+         dmHttpClient::Result r;
 diff --git a/engine/dlib/src/test/test_socket.cpp b/engine/dlib/src/test/test_socket.cpp
 index 7d28a552df..0853dafdd3 100644
 --- a/engine/dlib/src/test/test_socket.cpp
