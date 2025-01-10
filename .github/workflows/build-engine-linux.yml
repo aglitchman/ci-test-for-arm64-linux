@@ -72,9 +72,9 @@ jobs:
           qemu-aarch64-static -version
           wget https://github.com/multiarch/qemu-user-static/releases/download/v7.2.0-1/qemu-aarch64-static -O ./qemu-aarch64-static
           chmod +x ./qemu-aarch64-static
-          ./qemu-aarch64-static -version
           mkdir -p ./tmp/dynamo_home/ext/bin/
-          mv ./qemu-aarch64-static ./tmp/dynamo_home/ext/bin/
+          mv ./qemu-aarch64-static ./tmp/dynamo_home/ext/bin/x86_64-linux/
+          ./tmp/dynamo_home/ext/bin/x86_64-linux/qemu-aarch64-static -version
           ip addr
 
       - name: Build
