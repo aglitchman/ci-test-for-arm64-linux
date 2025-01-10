@@ -14,7 +14,7 @@ env:
 
 jobs:
   bld-eng-linux:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
         platform: [arm64-linux]
@@ -52,7 +52,6 @@ jobs:
           dotnet-version: 9.x
 
       - name: Install dependencies
-        if: matrix.platform == 'x86_64-linux'
         run: ci/ci.sh install --platform=${{ matrix.platform }}
 
       - name: Install ARM64 dependencies
@@ -60,18 +59,21 @@ jobs:
         run: |
           sudo dpkg --add-architecture arm64
           sudo sed -i -E 's/^deb /deb [arch=amd64] /' /etc/apt/sources.list
-          echo 'deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy main restricted universe multiverse' | sudo tee -a /etc/apt/sources.list
-          echo 'deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy-updates main restricted universe multiverse' | sudo tee -a /etc/apt/sources.list
-          echo 'deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy-security main restricted universe multiverse' | sudo tee -a /etc/apt/sources.list
+          echo 'deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports focal main restricted universe multiverse' | sudo tee -a /etc/apt/sources.list
+          echo 'deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports focal-updates main restricted universe multiverse' | sudo tee -a /etc/apt/sources.list
+          echo 'deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports focal-security main restricted universe multiverse' | sudo tee -a /etc/apt/sources.list
           sudo apt update
-          sudo apt install --no-install-recommends -y build-essential clang crossbuild-essential-arm64 qemu-user libc6-dev:arm64 libx11-dev:arm64 libxi-dev:arm64 libxcb-xkb-dev:arm64 libglu-dev:arm64 libgl-dev:arm64 libgles-dev:arm64 libopenal-dev:arm64
-          # sudo apt install -y iproute2:arm64
+          sudo apt install --no-install-recommends -y crossbuild-essential-arm64 qemu-user-static libc6-dev:arm64 libx11-dev:arm64 libxi-dev:arm64 libxcb-xkb-dev:arm64 libglu-dev:arm64 libgl-dev:arm64 libgles-dev:arm64 libopenal-dev:arm64
 
       # qemu-aarch64 -L /usr/aarch64-linux-gnu /usr/sbin/ip addr
       - name: Check qemu
         if: matrix.platform == 'arm64-linux'
         run: |
-          qemu-aarch64 -version
+          qemu-aarch64-static -version
+          wget https://github.com/multiarch/qemu-user-static/releases/download/v7.2.0-1/qemu-aarch64-static -O ./qemu-aarch64-static
+          chmod +x ./qemu-aarch64-static
+          sudo cp ./qemu-aarch64-static /usr/bin/qemu-aarch64-static
+          qemu-aarch64-static -version
           ip addr
 
       - name: Build
