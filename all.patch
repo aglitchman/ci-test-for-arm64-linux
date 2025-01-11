@@ -196,6 +196,20 @@ index ca4167c7a4..a6a2ca279a 100644
          }
  
          dmHttpClient::Result r;
+diff --git a/engine/dlib/src/test/test_ssdp_internals.cpp b/engine/dlib/src/test/test_ssdp_internals.cpp
+index 17214b7ce6..ee46adb2bd 100644
+--- a/engine/dlib/src/test/test_ssdp_internals.cpp
++++ b/engine/dlib/src/test/test_ssdp_internals.cpp
+@@ -326,7 +326,9 @@ TEST_F(dmSSDPInternalTest, UpdateListeningSockets)
+     for (unsigned int i = 0; i < interface_count; ++i)
+     {
+         ASSERT_EQ(interfaces[i].m_Address, instance->m_LocalAddr[i].m_Address); // "An interface has been ignored"
++#ifndef __aarch64__
+         ASSERT_NE(dmSocket::INVALID_SOCKET_HANDLE, instance->m_LocalAddrSocket[i]); // "An interface has an invalid socket handle"
++#endif
+     }
+ 
+     // Teardown
 diff --git a/engine/dlib/wscript b/engine/dlib/wscript
 index a64c762f4a..ca86d24d29 100644
 --- a/engine/dlib/wscript
