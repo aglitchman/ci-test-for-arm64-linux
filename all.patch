@@ -101,10 +101,31 @@ index c99d8717a6..471cca12c2 100644
          return;
      }
 diff --git a/engine/dlib/src/test/test_httpclient.cpp b/engine/dlib/src/test/test_httpclient.cpp
-index ca4167c7a4..08f5411444 100644
+index ca4167c7a4..31001f5f0b 100644
 --- a/engine/dlib/src/test/test_httpclient.cpp
 +++ b/engine/dlib/src/test/test_httpclient.cpp
-@@ -779,6 +779,25 @@ TEST_P(dmHttpClientTest, Test404)
+@@ -541,6 +541,7 @@ TEST_P(dmHttpClientTest, NoKeepAlive)
+ 
+     for (int i = 0; i < NUM_ITERATIONS; ++i)
+     {
++        dmLogInfo("<!> TESTING NO-KEEP-ALIVE %d / %d", i, NUM_ITERATIONS);
+         m_Content = "";
+         dmSnPrintf(buf, sizeof(buf), "/no-keep-alive");
+         dmHttpClient::Result r;
+@@ -604,6 +605,12 @@ TEST_P(dmHttpClientTest, ClientTimeout)
+ 
+     dmHttpClient::SetOptionInt(m_Client, dmHttpClient::OPTION_REQUEST_TIMEOUT, timeout_us); // microseconds
+ 
++#ifdef __aarch64__
++    dmLogInfo("<!!!> Platform is aarch64");
++#else
++    dmLogInfo("<!!!> Platform is x86_64");
++#endif
++
+     char buf[128];
+     for (int i = 0; i < 3; ++i)
+     {
+@@ -779,6 +786,25 @@ TEST_P(dmHttpClientTest, Test404)
      }
  }
  
@@ -130,7 +151,7 @@ index ca4167c7a4..08f5411444 100644
  TEST_P(dmHttpClientTest, Post)
  {
      for (int i = 0; i < 27; ++i)
-@@ -788,15 +807,20 @@ TEST_P(dmHttpClientTest, Post)
+@@ -788,15 +814,20 @@ TEST_P(dmHttpClientTest, Post)
          m_ToPost = "";
  
          for (int j = 0; j < n; ++j) {
@@ -153,7 +174,7 @@ index ca4167c7a4..08f5411444 100644
          ASSERT_EQ(dmHttpClient::RESULT_OK, r);
          ASSERT_EQ(200, m_StatusCode);
          ASSERT_EQ(sum, atoi(m_Content.c_str()));
-@@ -813,9 +837,10 @@ TEST_P(dmHttpClientTest, PostLarge)
+@@ -813,9 +844,10 @@ TEST_P(dmHttpClientTest, PostLarge)
          m_ToPost = "";
  
          for (int j = 0; j < n; ++j) {
@@ -166,6 +187,22 @@ index ca4167c7a4..08f5411444 100644
          }
  
          dmHttpClient::Result r;
+diff --git a/engine/dlib/wscript b/engine/dlib/wscript
+index a64c762f4a..ca86d24d29 100644
+--- a/engine/dlib/wscript
++++ b/engine/dlib/wscript
+@@ -119,8 +119,11 @@ def shutdown(sht):
+         print("Wrote test config file: %s" % configfilepath)
+ 
+     try:
++        print("<!!!> RUNNING TESTS")
+         waf_dynamo.run_tests(test_context, valgrind = True, configfile = configfilepath)
++        print("<!!!> TESTS FINISHED")
+     finally:
++        print("<!!!> FINAL STEP - Removing test config file")
+         os.remove(configfilepath)
+ 
+     # The test should work on OSX, but the CI (Catalina) just crashed with no callstack (even in lldb)
 diff --git a/engine/gamesys/src/gamesys/test/http/test_http_timeout.lua.raw b/engine/gamesys/src/gamesys/test/http/test_http_timeout.lua.raw
 index 20be336dcb..2e7895a1a6 100644
 --- a/engine/gamesys/src/gamesys/test/http/test_http_timeout.lua.raw
