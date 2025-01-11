@@ -101,7 +101,7 @@ index c99d8717a6..471cca12c2 100644
          return;
      }
 diff --git a/engine/dlib/src/test/test_httpclient.cpp b/engine/dlib/src/test/test_httpclient.cpp
-index ca4167c7a4..31001f5f0b 100644
+index ca4167c7a4..a6a2ca279a 100644
 --- a/engine/dlib/src/test/test_httpclient.cpp
 +++ b/engine/dlib/src/test/test_httpclient.cpp
 @@ -541,6 +541,7 @@ TEST_P(dmHttpClientTest, NoKeepAlive)
@@ -112,6 +112,15 @@ index ca4167c7a4..31001f5f0b 100644
          m_Content = "";
          dmSnPrintf(buf, sizeof(buf), "/no-keep-alive");
          dmHttpClient::Result r;
+@@ -593,7 +594,7 @@ TEST_P(dmHttpClientTest, ClientTimeout)
+     // We also want to keep the unit tests below a certain amount of seconds, so we also decrease the number of iterations in this loop.
+ 
+     int sleep_time_ms = 5 * 1000;
+-    #if defined(DM_PLATFORM_VENDOR) || defined (DM_SANITIZE_THREAD)
++    #if defined(DM_PLATFORM_VENDOR) || defined (DM_SANITIZE_THREAD) || defined(__aarch64__)
+         const int timeout_us = 5000 * 1000;
+         sleep_time_ms = 50 * 1000;
+     #elif defined(__SCE__)
 @@ -604,6 +605,12 @@ TEST_P(dmHttpClientTest, ClientTimeout)
  
      dmHttpClient::SetOptionInt(m_Client, dmHttpClient::OPTION_REQUEST_TIMEOUT, timeout_us); // microseconds
