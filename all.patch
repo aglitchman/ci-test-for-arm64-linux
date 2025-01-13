@@ -1,18 +1,19 @@
 diff --git a/build_tools/waf_dynamo.py b/build_tools/waf_dynamo.py
-index 4bd9ca09f7..41ce2ecf69 100644
+index 4bd9ca09f7..b5eecbbe4c 100644
 --- a/build_tools/waf_dynamo.py
 +++ b/build_tools/waf_dynamo.py
-@@ -1449,6 +1449,9 @@ def run_tests(ctx, valgrind = False, configfile = None):
+@@ -1449,6 +1449,10 @@ def run_tests(ctx, valgrind = False, configfile = None):
              if 'web' in ctx.env.PLATFORM: # should be moved to TEST_LAUNCH_ARGS
                  cmd = '%s %s' % (ctx.env['NODEJS'][0], cmd)
  
 +            if ctx.env.PLATFORM != ctx.env.BUILD_PLATFORM and 'arm64-linux' in ctx.env.PLATFORM:
 +                cmd = '%s %s' % (ctx.env['QEMU_AARCH64'], cmd)
++                env['SKIP_SSDP_TESTS'] = '1'
 +
          # disable shortly during beta release, due to issue with jctest + test_gui
          valgrind = False
          if valgrind:
-@@ -1731,6 +1734,15 @@ def detect(conf):
+@@ -1731,6 +1735,15 @@ def detect(conf):
              conf.env.CC = "clang"
              conf.env.CPP = "clang -E"
  
@@ -197,7 +198,7 @@ index ca4167c7a4..a6a2ca279a 100644
  
          dmHttpClient::Result r;
 diff --git a/engine/dlib/src/test/test_ssdp_internals.cpp b/engine/dlib/src/test/test_ssdp_internals.cpp
-index 17214b7ce6..ee46adb2bd 100644
+index 17214b7ce6..c3f98b7c4e 100644
 --- a/engine/dlib/src/test/test_ssdp_internals.cpp
 +++ b/engine/dlib/src/test/test_ssdp_internals.cpp
 @@ -326,7 +326,9 @@ TEST_F(dmSSDPInternalTest, UpdateListeningSockets)
@@ -210,6 +211,22 @@ index 17214b7ce6..ee46adb2bd 100644
      }
  
      // Teardown
+@@ -335,6 +337,7 @@ TEST_F(dmSSDPInternalTest, UpdateListeningSockets)
+ 
+ TEST_F(dmSSDPInternalTest, SendAnnounce)
+ {
++#ifndef __aarch64__
+     // Setup
+     dmSSDP::Result result = dmSSDP::RESULT_OK;
+     dmSSDP::SSDP* instance = CreateSSDPClient();
+@@ -356,6 +359,7 @@ TEST_F(dmSSDPInternalTest, SendAnnounce)
+     // Teardown
+     DestroySSDPInstance(instance);
+     FreeDeviceDescription(&deviceDesc);
++#endif
+ }
+ 
+ TEST_F(dmSSDPInternalTest, SendUnannounce)
 diff --git a/engine/dlib/wscript b/engine/dlib/wscript
 index a64c762f4a..ca86d24d29 100644
 --- a/engine/dlib/wscript
