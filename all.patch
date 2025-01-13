@@ -29,6 +29,18 @@ index 4bd9ca09f7..b5eecbbe4c 100644
      platform_setup_tools(conf, build_util)
  
      # jg: this whole thing is a 'dirty hack' to be able to pick up our own SDKs
+diff --git a/engine/crash/src/test/test_crash.cpp b/engine/crash/src/test/test_crash.cpp
+index 3c69313e01..9043d1f8bb 100644
+--- a/engine/crash/src/test/test_crash.cpp
++++ b/engine/crash/src/test/test_crash.cpp
+@@ -103,6 +103,7 @@ TEST_F(dmCrashTest, TestLoad)
+     {
+         const char *name = dmCrash::GetModuleName(d, i);
+         void *addr = dmCrash::GetModuleAddr(d, i);
++        dmLogInfo("<!> Crash test load -> %d: %s", i, name);
+         if (!name)
+         {
+             break;
 diff --git a/engine/dlib/src/dlib/linux/socket_linux.cpp b/engine/dlib/src/dlib/linux/socket_linux.cpp
 index c99d8717a6..471cca12c2 100644
 --- a/engine/dlib/src/dlib/linux/socket_linux.cpp
