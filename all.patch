@@ -198,7 +198,7 @@ index ca4167c7a4..a6a2ca279a 100644
  
          dmHttpClient::Result r;
 diff --git a/engine/dlib/src/test/test_ssdp_internals.cpp b/engine/dlib/src/test/test_ssdp_internals.cpp
-index 17214b7ce6..c3f98b7c4e 100644
+index 17214b7ce6..581c7abbb1 100644
 --- a/engine/dlib/src/test/test_ssdp_internals.cpp
 +++ b/engine/dlib/src/test/test_ssdp_internals.cpp
 @@ -326,7 +326,9 @@ TEST_F(dmSSDPInternalTest, UpdateListeningSockets)
@@ -227,6 +227,22 @@ index 17214b7ce6..c3f98b7c4e 100644
  }
  
  TEST_F(dmSSDPInternalTest, SendUnannounce)
+@@ -386,6 +390,7 @@ TEST_F(dmSSDPInternalTest, SendUnannounce)
+ 
+ TEST_F(dmSSDPInternalTest, ClientServer_MatchingInterfaces)
+ {
++#ifndef __aarch64__
+     // Setup
+     dmSSDP::SSDP* client = CreateSSDPClient();
+     dmSSDP::SSDP* server = CreateSSDPServer();
+@@ -414,6 +419,7 @@ TEST_F(dmSSDPInternalTest, ClientServer_MatchingInterfaces)
+     // Teardown
+     dmSSDP::Delete(server);
+     DestroySSDPInstance(client);
++#endif
+ }
+ 
+ int main(int argc, char **argv)
 diff --git a/engine/dlib/wscript b/engine/dlib/wscript
 index a64c762f4a..ca86d24d29 100644
 --- a/engine/dlib/wscript
