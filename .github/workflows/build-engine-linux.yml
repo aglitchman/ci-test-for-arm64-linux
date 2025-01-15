@@ -81,7 +81,7 @@ jobs:
 
       - name: Build
         if: matrix.platform == 'arm64-linux'
-        run: ci/ci.sh --platform=${{ matrix.platform }} --skip-builtins --skip-docs engine
+        run: QEMU_AARCH64=`pwd`/qemu-aarch64-static ci/ci.sh --platform=${{ matrix.platform }} --skip-builtins --skip-docs engine
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
