@@ -222,10 +222,18 @@ index ca4167c7a4..af6df0c16f 100644
  
          dmHttpClient::Result r;
 diff --git a/engine/dlib/src/test/test_ssdp_internals.cpp b/engine/dlib/src/test/test_ssdp_internals.cpp
-index 17214b7ce6..8fd1ee55af 100644
+index 17214b7ce6..d4c1b3fb79 100644
 --- a/engine/dlib/src/test/test_ssdp_internals.cpp
 +++ b/engine/dlib/src/test/test_ssdp_internals.cpp
-@@ -326,7 +326,14 @@ TEST_F(dmSSDPInternalTest, UpdateListeningSockets)
+@@ -20,6 +20,7 @@
+ #include <dlib/hashtable.h>
+ #include <dlib/ssdp.h>
+ #include <dlib/ssdp_private.h>
++#include <dlib/sys.h>
+ #include <dlib/dstrings.h>
+ #define JC_TEST_IMPLEMENTATION
+ #include <jc_test/jc_test.h>
+@@ -326,7 +327,14 @@ TEST_F(dmSSDPInternalTest, UpdateListeningSockets)
      for (unsigned int i = 0; i < interface_count; ++i)
      {
          ASSERT_EQ(interfaces[i].m_Address, instance->m_LocalAddr[i].m_Address); // "An interface has been ignored"
@@ -241,7 +249,7 @@ index 17214b7ce6..8fd1ee55af 100644
      }
  
      // Teardown
-@@ -335,6 +342,7 @@ TEST_F(dmSSDPInternalTest, UpdateListeningSockets)
+@@ -335,6 +343,7 @@ TEST_F(dmSSDPInternalTest, UpdateListeningSockets)
  
  TEST_F(dmSSDPInternalTest, SendAnnounce)
  {
@@ -249,7 +257,7 @@ index 17214b7ce6..8fd1ee55af 100644
      // Setup
      dmSSDP::Result result = dmSSDP::RESULT_OK;
      dmSSDP::SSDP* instance = CreateSSDPClient();
-@@ -356,6 +364,7 @@ TEST_F(dmSSDPInternalTest, SendAnnounce)
+@@ -356,6 +365,7 @@ TEST_F(dmSSDPInternalTest, SendAnnounce)
      // Teardown
      DestroySSDPInstance(instance);
      FreeDeviceDescription(&deviceDesc);
@@ -257,7 +265,7 @@ index 17214b7ce6..8fd1ee55af 100644
  }
  
  TEST_F(dmSSDPInternalTest, SendUnannounce)
-@@ -386,6 +395,7 @@ TEST_F(dmSSDPInternalTest, SendUnannounce)
+@@ -386,6 +396,7 @@ TEST_F(dmSSDPInternalTest, SendUnannounce)
  
  TEST_F(dmSSDPInternalTest, ClientServer_MatchingInterfaces)
  {
@@ -265,7 +273,7 @@ index 17214b7ce6..8fd1ee55af 100644
      // Setup
      dmSSDP::SSDP* client = CreateSSDPClient();
      dmSSDP::SSDP* server = CreateSSDPServer();
-@@ -414,6 +424,7 @@ TEST_F(dmSSDPInternalTest, ClientServer_MatchingInterfaces)
+@@ -414,6 +425,7 @@ TEST_F(dmSSDPInternalTest, ClientServer_MatchingInterfaces)
      // Teardown
      dmSSDP::Delete(server);
      DestroySSDPInstance(client);
