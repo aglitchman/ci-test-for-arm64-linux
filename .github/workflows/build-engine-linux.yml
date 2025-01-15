@@ -66,15 +66,14 @@ jobs:
           sudo apt install --no-install-recommends -y crossbuild-essential-arm64 qemu-user-static libc6-dev:arm64 libx11-dev:arm64 libxi-dev:arm64 libxcb-xkb-dev:arm64 libglu-dev:arm64 libgl-dev:arm64 libgles-dev:arm64 libopenal-dev:arm64
 
       # qemu-aarch64 -L /usr/aarch64-linux-gnu /usr/sbin/ip addr
-      # - name: Check qemu
-      #   if: matrix.platform == 'arm64-linux'
-      #   run: |
-      #     qemu-aarch64-static -version
-      #     wget https://github.com/multiarch/qemu-user-static/releases/download/v7.2.0-1/qemu-aarch64-static -O ./qemu-aarch64-static
-      #     chmod +x ./qemu-aarch64-static
-      #     ./qemu-aarch64-static -version
-      #     ip addr
-      #     QEMU_AARCH64=`pwd`/qemu-aarch64-static 
+      - name: Check qemu
+        if: matrix.platform == 'arm64-linux'
+        run: |
+          qemu-aarch64-static -version
+          wget https://github.com/multiarch/qemu-user-static/releases/download/v7.2.0-1/qemu-aarch64-static -O ./qemu-aarch64-static
+          chmod +x ./qemu-aarch64-static
+          ./qemu-aarch64-static -version
+          ip addr
 
       - name: Build
         if: matrix.platform == 'x86_64-linux'
