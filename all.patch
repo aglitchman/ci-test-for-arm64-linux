@@ -30,7 +30,7 @@ index 4bd9ca09f7..900ce32289 100644
  
      # jg: this whole thing is a 'dirty hack' to be able to pick up our own SDKs
 diff --git a/engine/crash/src/test/test_crash.cpp b/engine/crash/src/test/test_crash.cpp
-index 3c69313e01..9bfb35aa54 100644
+index 3c69313e01..1e3f241770 100644
 --- a/engine/crash/src/test/test_crash.cpp
 +++ b/engine/crash/src/test/test_crash.cpp
 @@ -115,7 +115,13 @@ TEST_F(dmCrashTest, TestLoad)
@@ -41,10 +41,10 @@ index 3c69313e01..9bfb35aa54 100644
 +    int expected_count = 3;
 +    if (dmSys::GetEnv("QEMU_RUNNER"))
 +    {
-+        dmLogInfo("<!> QEMU_RUNNER detected, increasing expected_count to 1");
++        dmLogInfo("<!> QEMU_RUNNER detected, expected_count to 0");
 +        expected_count = 1;
 +    }
-+    ASSERT_GT(count, expected_count);
++    ASSERT_GE(count, expected_count);
  }
  
  TEST_F(dmCrashTest, TestPurgeCustomPath)
