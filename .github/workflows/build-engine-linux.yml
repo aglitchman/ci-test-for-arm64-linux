@@ -14,7 +14,7 @@ env:
 
 jobs:
   bld-eng-linux:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         platform: [arm64-linux]
@@ -61,9 +61,9 @@ jobs:
         run: |
           sudo dpkg --add-architecture arm64
           sudo sed -i -E 's/^deb /deb [arch=amd64] /' /etc/apt/sources.list
-          echo 'deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports focal main restricted universe multiverse' | sudo tee -a /etc/apt/sources.list
-          echo 'deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports focal-updates main restricted universe multiverse' | sudo tee -a /etc/apt/sources.list
-          echo 'deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports focal-security main restricted universe multiverse' | sudo tee -a /etc/apt/sources.list
+          echo 'deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy main restricted universe multiverse' | sudo tee -a /etc/apt/sources.list
+          echo 'deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy-updates main restricted universe multiverse' | sudo tee -a /etc/apt/sources.list
+          echo 'deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports jammy-security main restricted universe multiverse' | sudo tee -a /etc/apt/sources.list
           sudo apt update
           sudo apt install --no-install-recommends crossbuild-essential-arm64 qemu-user libc6-dev:arm64 libx11-dev:arm64 libxi-dev:arm64 libxext-dev:arm64 libxcb-xkb-dev:arm64 libglu-dev:arm64 libgl-dev:arm64 libgles-dev:arm64 libopenal-dev:arm64 libxrandr-dev:arm64
 
