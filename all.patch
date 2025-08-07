@@ -11,3 +11,4 @@ index 8d3ec5ae34..0fa59ff317 100755
 +
          run.shell_command("%s %s" % (strip, path))
          return True
+ 
