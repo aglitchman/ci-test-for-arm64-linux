@@ -10,7 +10,7 @@ on:
 
 env:
   DM_PACKAGES_URL: https://github.com/llvm/llvm-project/releases/download/llvmorg-16.0.0/
-  BUILD_REF: d1d36e9166e59ba1abf40966afb15c93efe15957
+  BUILD_REF: 1.10.4
 
 jobs:
   bld-eng-linux:
@@ -18,7 +18,8 @@ jobs:
     strategy:
       matrix:
         platform: [arm64-linux]
-        # x86_64-linux, arm64-linux
+        # platform: [x86_64-linux, arm64-linux]
+
     steps:
       - name: Checkout Defold
         uses: actions/checkout@v4
@@ -31,6 +32,7 @@ jobs:
         with:
           path: patches
 
+      # (not needed, but let's keep it here for now)
       - name: Apply patches
         run: |
           git apply patches/all.patch
@@ -38,7 +40,7 @@ jobs:
       - name: Install Python
         uses: actions/setup-python@0a5c61591373683505ea898e09a3ea4f39ef2b9c
         with:
-          python-version: 3.12
+          python-version: 3.13
 
       - name: Install Java
         uses: actions/setup-java@99b8673ff64fbf99d8d325f52d9a5bdedb8483e9
@@ -63,37 +65,13 @@ jobs:
           echo 'deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports focal-updates main restricted universe multiverse' | sudo tee -a /etc/apt/sources.list
           echo 'deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports focal-security main restricted universe multiverse' | sudo tee -a /etc/apt/sources.list
           sudo apt update
-          sudo apt install --no-install-recommends -y crossbuild-essential-arm64 qemu-user-static libc6-dev:arm64 libx11-dev:arm64 libxi-dev:arm64 libxcb-xkb-dev:arm64 libglu-dev:arm64 libgl-dev:arm64 libgles-dev:arm64 libopenal-dev:arm64
-
-      # qemu-aarch64 -L /usr/aarch64-linux-gnu /usr/sbin/ip addr
-      - name: Check qemu
-        if: matrix.platform == 'arm64-linux'
-        run: |
-          qemu-aarch64-static -version
-          wget https://github.com/multiarch/qemu-user-static/releases/download/v7.2.0-1/qemu-aarch64-static -O ./qemu-aarch64-static
-          chmod +x ./qemu-aarch64-static
-          ./qemu-aarch64-static -version
-          ip addr
+          sudo apt install --no-install-recommends crossbuild-essential-arm64 qemu-user-static libc6-dev:arm64 libx11-dev:arm64 libxi-dev:arm64 libxext-dev:arm64 libxcb-xkb-dev:arm64 libglu-dev:arm64 libgl-dev:arm64 libgles-dev:arm64 libopenal-dev:arm64 libxrandr-dev:arm64
 
       - name: Build
-        if: matrix.platform == 'x86_64-linux'
         run: ci/ci.sh --platform=${{ matrix.platform }} --skip-builtins --skip-docs engine
 
-      - name: Build
-        if: matrix.platform == 'arm64-linux'
-        run: QEMU_AARCH64=`pwd`/qemu-aarch64-static ci/ci.sh --platform=${{ matrix.platform }} --skip-builtins --skip-docs engine
-
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
-        if: matrix.platform == 'x86_64-linux'
-        with:
-          name: defold-${{ matrix.platform }}
-          path: |
-            tmp/dynamo_home/bin/${{ matrix.platform }}
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        if: matrix.platform == 'arm64-linux'
         with:
           name: defold-${{ matrix.platform }}
           path: |
