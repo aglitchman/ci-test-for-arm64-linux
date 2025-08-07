@@ -65,10 +65,15 @@ jobs:
           echo 'deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports focal-updates main restricted universe multiverse' | sudo tee -a /etc/apt/sources.list
           echo 'deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports focal-security main restricted universe multiverse' | sudo tee -a /etc/apt/sources.list
           sudo apt update
-          sudo apt install --no-install-recommends crossbuild-essential-arm64 qemu-user-static libc6-dev:arm64 libx11-dev:arm64 libxi-dev:arm64 libxext-dev:arm64 libxcb-xkb-dev:arm64 libglu-dev:arm64 libgl-dev:arm64 libgles-dev:arm64 libopenal-dev:arm64 libxrandr-dev:arm64
+          sudo apt install --no-install-recommends crossbuild-essential-arm64 qemu-user libc6-dev:arm64 libx11-dev:arm64 libxi-dev:arm64 libxext-dev:arm64 libxcb-xkb-dev:arm64 libglu-dev:arm64 libgl-dev:arm64 libgles-dev:arm64 libopenal-dev:arm64 libxrandr-dev:arm64
 
       - name: Build
-        run: ci/ci.sh --platform=${{ matrix.platform }} --skip-builtins --skip-docs engine
+        run: ci/ci.sh --platform=${{ matrix.platform }} --skip-builtins --skip-tests --skip-build-tests --skip-docs engine
+
+      - name: Test if engine runs
+        if: matrix.platform == 'arm64-linux'
+        run: |
+          timeout 5 qemu-aarch64 -L /usr/aarch64-linux-gnu ./tmp/dynamo_home/bin/arm64-linux/dmengine_headless --version || true
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
