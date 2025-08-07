@@ -56,6 +56,10 @@ jobs:
       - name: Install dependencies
         run: ci/ci.sh install --platform=${{ matrix.platform }}
 
+      - name: Install x86_64 dependencies
+        if: matrix.platform == 'arm64-linux'
+        run: ci/ci.sh install --platform=x86_64-linux
+
       - name: Install ARM64 dependencies
         if: matrix.platform == 'arm64-linux'
         run: |
@@ -70,6 +74,7 @@ jobs:
       - name: Build
         run: |
           export PATH=$PWD/tmp/dynamo_home/ext/SDKs/x86_64-linux/clang-16.0.0/bin/:$PATH
+          which clang
           ci/ci.sh --platform=${{ matrix.platform }} --skip-builtins --skip-tests --skip-build-tests --skip-docs engine
 
       - name: Test if engine runs
